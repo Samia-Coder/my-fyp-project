@@ -1,0 +1,97 @@
+import { Navigate, Route, Routes } from "react-router-dom";
+import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+
+import HomePage from "./pages/HomePage";
+import SignUpPage from "./pages/SignUpPage";
+import LoginPage from "./pages/LoginPage";
+import AdminPage from "./pages/AdminPage";
+import CategoryPage from "./pages/CategoryPage";
+import Navbar from "./components/Navbar";
+import MegaMenu from "./components/MegaMenu";
+import Footer from "./components/Footer";
+import LoadingSpinner from "./components/LoadingSpinner";
+import CartPage from "./pages/CartPage";
+import PurchaseSuccessPage from "./pages/PurchaseSuccessPage";
+import PurchaseCancelPage from "./pages/PurchaseCancelPage";
+import AIChatbot from "./components/AIChatbot";
+import ProfilePage from "./pages/ProfilePage";
+import OrdersPage from "./pages/OrdersPage";
+import WishlistPage from "./pages/WishlistPage";
+
+import { useUserStore } from "./stores/useUserStore";
+import { useCartStore } from "./stores/useCartStore";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import SearchPage from "./pages/SearchPage";
+
+function App() {
+    const { user, checkAuth, checkingAuth } = useUserStore();
+    const { getCartItems } = useCartStore();
+
+    useEffect(() => { 
+        checkAuth(); 
+    }, [checkAuth]);
+
+    useEffect(() => { 
+        if (!user) return; 
+        getCartItems(); 
+    }, [getCartItems, user]);
+
+    if (checkingAuth) return <LoadingSpinner />;
+
+    return (
+        <div className='min-h-screen bg-[#FFF5F7] text-[#2D2D2D] relative overflow-hidden'>
+            {/* Background Decorations */}
+            <div className='fixed inset-0 pointer-events-none'>
+                <div className='absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,rgba(194,24,91,0.08)_0%,transparent_50%)]' />
+                <div className='absolute bottom-0 right-0 w-full h-full bg-[radial-gradient(ellipse_at_bottom_left,rgba(233,30,99,0.06)_0%,transparent_50%)]' />
+                <div className='absolute inset-0 opacity-[0.03]' style={{
+                    backgroundImage: 'radial-gradient(circle, #C2185B 1px, transparent 1px)',
+                    backgroundSize: '30px 30px'
+                }} />
+            </div>
+            
+            <div className='relative z-50'>
+                <Navbar />
+                <MegaMenu />
+                <main className="pt-4 min-h-[calc(100vh-300px)]">
+                    <Routes>
+                        <Route path='/' element={<HomePage />} />
+                        <Route path='/signup' element={!user ? <SignUpPage /> : <Navigate to='/' />} />
+                        <Route path='/login' element={!user ? <LoginPage /> : <Navigate to='/' />} />
+                        <Route path='/profile' element={user ? <ProfilePage /> : <Navigate to='/login' />} />
+                        <Route path='/orders' element={user ? <OrdersPage /> : <Navigate to='/login' />} />
+                        <Route path='/wishlist' element={user ? <WishlistPage /> : <Navigate to='/login' />} />
+                        <Route path='/secret-dashboard' element={user?.role === "admin" ? <AdminPage /> : <Navigate to='/login' />} />
+                        
+                        {/* Category Routes */}
+                        <Route path='/category/:category' element={<CategoryPage />} />
+                        <Route path='/category/:category/:subcategory' element={<CategoryPage />} />
+                        
+                        <Route path='/cart' element={user ? <CartPage /> : <Navigate to='/login' />} />
+                        <Route path='/purchase-success' element={user ? <PurchaseSuccessPage /> : <Navigate to='/login' />} />
+                        <Route path='/purchase-cancel' element={user ? <PurchaseCancelPage /> : <Navigate to='/login' />} />
+                        <Route path='/product/:id' element={<ProductDetailPage />} />
+                        <Route path='/search' element={<SearchPage />} />
+                    </Routes>
+                </main>
+                <Footer />
+            </div>
+            
+            <Toaster 
+                position="top-center"
+                toastOptions={{
+                    style: {
+                        background: '#880E4F',
+                        color: '#fff',
+                        border: '1px solid #C2185B',
+                    },
+                }}
+            />
+            
+            <AIChatbot />
+        </div>
+    );
+}
+
+export default App;
