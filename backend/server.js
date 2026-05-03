@@ -2,6 +2,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 import express from "express";
+import rateLimit from 'express-rate-limit';
+import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from "cookie-parser";
 import path from "path";
 import cors from "cors";
@@ -44,6 +46,18 @@ const __dirname = path.resolve();
 
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
+
+// 🔒 SECURITY MIDDLEWARE - Rate Limiting & NoSQL Injection Protection
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // 100 requests per window
+    message: { success: false, message: "Too many requests, please try again later" },
+    standardHeaders: true,
+    legacyHeaders: false,
+});
+app.use('/api/', limiter); // Apply to all API routes
+
+app.use(mongoSanitize()); // Remove $ operators from user input
 
 // API Routes
 app.use("/api/auth", authRoutes);
