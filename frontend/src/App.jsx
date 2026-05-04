@@ -10,6 +10,7 @@ import AIChatbot from "./components/AIChatbot";
 
 import { useUserStore } from "./stores/useUserStore";
 import { useCartStore } from "./stores/useCartStore";
+import CreateProductForm from "./components/CreateProductForm";
 
 // Lazy load pages for better performance (code splitting)
 const HomePage = lazy(() => import("./pages/HomePage"));
@@ -76,6 +77,7 @@ function App() {
                             <Route path='/purchase-cancel' element={user ? <PurchaseCancelPage /> : <Navigate to='/login' />} />
                             <Route path='/product/:id' element={<ProductDetailPage />} />
                             <Route path='/search' element={<SearchPage />} />
+                            <Route path='/createproductform' element={user?.role === "admin" ? <CreateProductForm /> : <Navigate to='/login' />} />
                         </Routes>
                     </Suspense>
                 </main>

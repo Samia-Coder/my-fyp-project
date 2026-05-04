@@ -376,100 +376,102 @@ const HomePage = () => {
                 </div>
             </div>
 
-            {/* Categories Section */}
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
-                <div className="text-center mb-12">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                    >
-                        <span className="inline-flex items-center gap-2 bg-brand-bg text-brand-primary px-4 py-2 rounded-full text-sm font-medium mb-4 border border-brand-accent/30">
-                            <Sparkles size={16} />
-                            Browse Collection
-                        </span>
-                        <h2 className="text-3xl md:text-5xl font-bold text-brand-dark mb-4">Shop by Category</h2>
-                        <p className="text-gray-500 max-w-xl mx-auto">Explore our wide range of premium categories</p>
-                    </motion.div>
-                </div>
+           {/* Categories Section */}
+<div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20">
+    <div className="text-center mb-12">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+        >
+            <span className="inline-flex items-center gap-2 bg-brand-bg text-brand-primary px-4 py-2 rounded-full text-sm font-medium mb-4 border border-brand-accent/30">
+                <Sparkles size={16} />
+                Browse Collection
+            </span>
+            <h2 className="text-3xl md:text-5xl font-bold text-brand-dark mb-4">Shop by Category</h2>
+            <p className="text-gray-500 max-w-xl mx-auto">Explore our wide range of premium categories</p>
+        </motion.div>
+    </div>
 
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-                    {categories.map((category, index) => {
-                        const categoryImageMap = {
-                            'electronics': '/image/electronics.jpg',
-                            'fashion': '/image/fashion.jpg',
-                            'home & living': '/image/home-living.jpg',
-                            'beauty & health': '/image/beauty-health.jpg',
-                            'sports & outdoor': '/image/sports.jpg',
-                            'books & stationery': '/image/books.jpg',
-                        };
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {categories.map((category, index) => {
+            const categoryImageMap = {
+                'electronics': '/image/electronics.jpg',
+                'fashion': '/image/fashion.jpg',
+                'home & living': '/image/home-living.jpg',
+                'beauty & health': '/image/beauty-health.jpg',
+                'sports & outdoor': '/image/sports.jpg',
+                'books & stationery': '/image/books.jpg',
+            };
 
-                        const slug = category.slug?.toLowerCase() || '';
-                        const name = category.name?.toLowerCase() || '';
-                        
-                        let imageUrl = category.image;
-                        
-                        if (!imageUrl || imageUrl.trim() === "" || imageUrl === "null" || imageUrl === "undefined") {
-                            imageUrl = categoryImageMap[slug] || categoryImageMap[name] || '/image/electronics.jpg';
-                        }
-                        
-                        if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/image/') && !imageUrl.startsWith('/public/')) {
-                            imageUrl = `/image/${imageUrl}`;
-                        }
+            const slug = category.slug?.toLowerCase() || '';
+            const name = category.name?.toLowerCase() || '';
+            
+            let imageUrl = category.image;
+            
+            if (!imageUrl || imageUrl.trim() === "" || imageUrl === "null" || imageUrl === "undefined") {
+                imageUrl = categoryImageMap[slug] || categoryImageMap[name] || '/image/electronics.jpg';
+            }
+            
+            if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/image/') && !imageUrl.startsWith('/public/')) {
+                imageUrl = `/image/${imageUrl}`;
+            }
 
-                        const itemCount = category.subcategories?.length || 0;
+            const itemCount = category.subcategories?.length || 0;
 
-                        return (
-                            <motion.div 
-                                key={category.slug || index} 
-                                initial={{ opacity: 0, y: 30 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
-                            >
-                                <Link to={`/category/${category.slug}`} className="group block">
-                                    <GlassCard>
-                                        <div className="relative aspect-[3/4] overflow-hidden">
-                                            <div className="h-3/5 w-full relative overflow-hidden">
-                                                <ImageComponent 
-                                                    src={imageUrl}
-                                                    alt={category.name}
-                                                    className="w-full h-full group-hover:scale-110 transition-transform duration-500"
-                                                />
-                                                
-                                                <div className="absolute inset-0 bg-brand-dark/0 group-hover:bg-brand-dark/20 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                                                    <div className="flex gap-2">
-                                                        <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-brand-primary shadow-md">
-                                                            <Eye size={18} />
-                                                        </div>
-                                                        <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-md">
-                                                            <Heart size={18} />
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                                
-                                                <div className="absolute top-2 left-2 bg-white/90 px-2 py-1 rounded-full text-[10px] font-bold text-brand-primary">
-                                                    {itemCount} items
-                                                </div>
+            return (
+                <motion.div 
+                    key={category.slug || index} 
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                >
+                    <Link to={`/category/${category.slug}`} className="group block">
+                        {/* FIXED CARD - No conflicting animations */}
+                        <div className="relative bg-white rounded-2xl shadow-md border border-brand-accent/20 overflow-hidden transition-all duration-300 hover:shadow-xl hover:border-brand-accent/40 hover:-translate-y-1">
+                            <div className="relative aspect-[3/4] overflow-hidden">
+                                <div className="h-3/5 w-full relative overflow-hidden">
+                                    <ImageComponent 
+                                        src={imageUrl}
+                                        alt={category.name}
+                                        className="w-full h-full transition-transform duration-500 ease-out group-hover:scale-110"
+                                    />
+                                    
+                                    {/* FIXED OVERLAY - Smooth fade without blink */}
+                                    <div className="absolute inset-0 bg-brand-dark/0 group-hover:bg-brand-dark/30 transition-all duration-300 flex items-center justify-center">
+                                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform translate-y-2 group-hover:translate-y-0">
+                                            <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-brand-primary shadow-md hover:scale-110 transition-transform">
+                                                <Eye size={18} />
                                             </div>
-                                            
-                                            <div className="p-4 text-center h-2/5 flex flex-col justify-center">
-                                                <h3 className="text-base font-bold text-brand-dark group-hover:text-brand-primary transition-colors">
-                                                    {category.name}
-                                                </h3>
-                                                <div className="mt-2 inline-flex items-center justify-center gap-1 text-brand-primary text-xs opacity-0 group-hover:opacity-100 transition-all">
-                                                    <span>Explore</span>
-                                                    <ArrowUpRight size={14} />
-                                                </div>
+                                            <div className="w-10 h-10 bg-brand-primary rounded-xl flex items-center justify-center text-white shadow-md hover:scale-110 transition-transform">
+                                                <Heart size={18} />
                                             </div>
                                         </div>
-                                    </GlassCard>
-                                </Link>
-                            </motion.div>
-                        );
-                    })}
-                </div>
-            </div>
+                                    </div>
+                                    
+                                    <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full text-[10px] font-bold text-brand-primary">
+                                        {itemCount} items
+                                    </div>
+                                </div>
+                                
+                                <div className="p-4 text-center h-2/5 flex flex-col justify-center bg-white">
+                                    <h3 className="text-base font-bold text-brand-dark group-hover:text-brand-primary transition-colors duration-300">
+                                        {category.name}
+                                    </h3>
+                                    <div className="mt-2 inline-flex items-center justify-center gap-1 text-brand-primary text-xs opacity-0 group-hover:opacity-100 transition-all duration-300">
+                                        <span>Explore</span>
+                                        <ArrowUpRight size={14} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </Link>
+                </motion.div>
+            );
+        })}
+    </div>
+</div>
 
             {/* Featured Products */}
             {!loading && products.length > 0 && (

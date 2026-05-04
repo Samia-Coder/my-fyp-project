@@ -128,7 +128,7 @@ const ProductsList = () => {
                     </motion.div>
                     <h3 className="text-2xl font-black text-[#880E4F] mb-3">No Products Found</h3>
                     <p className="text-[#C2185B] opacity-60 mb-6 font-medium">Create your first product to see it here!</p>
-                    <Link to="/add-product">
+                    <Link to="/createproductform">
                         <motion.button
                             className="bg-gradient-to-r from-[#C2185B] to-[#E91E63] text-white px-6 py-3 rounded-xl font-bold shadow-lg shadow-[#C2185B]/30 flex items-center gap-2 mx-auto"
                             whileHover={{ scale: 1.05, y: -2 }}
