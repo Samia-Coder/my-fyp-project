@@ -591,12 +591,11 @@ const ProductDetailPage = () => {
 
                 {/* Tabs Section */}
                 <motion.div 
-                    className="mt-20"
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6 }}
-                >
+    className="mt-20"
+    initial={{ opacity: 0, y: 30 }}
+    animate={{ opacity: 1, y: 0 }}      
+    transition={{ duration: 0.6, delay: 0.3 }}
+>
                     <div className="flex gap-2 bg-white rounded-2xl p-2 border border-[#F8BBD9]/30 w-fit mb-8 shadow-lg">
                         {[
                             { id: "description", label: "Description", icon: Info },
@@ -651,15 +650,14 @@ const ProductDetailPage = () => {
                                     Customer Reviews
                                 </h3>
                                 <div className="space-y-8">
-                                    {[1, 2, 3].map((review, idx) => (
-                                        <motion.div 
-                                            key={review} 
-                                            className="border-b border-[#F8BBD9]/30 pb-8 last:border-0"
-                                            initial={{ opacity: 0, x: -20 }}
-                                            whileInView={{ opacity: 1, x: 0 }}
-                                            viewport={{ once: true }}
-                                            transition={{ delay: idx * 0.1 }}
-                                        >
+                                   {[1, 2, 3].map((review, idx) => (
+    <motion.div 
+        key={review} 
+        className="border-b border-[#F8BBD9]/30 pb-8 last:border-0"
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}       
+        transition={{ delay: idx * 0.1 }}
+    >
                                             <div className="flex items-center gap-4 mb-4">
                                                 <div className="w-12 h-12 bg-gradient-to-br from-[#C2185B] to-[#880E4F] rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg">
                                                     U{review}
@@ -718,14 +716,13 @@ const ProductDetailPage = () => {
 
                 {/* Related Products */}
                 <AnimatePresence>
-                    {relatedProducts.length > 0 && (
-                        <motion.div 
-                            className="mt-20"
-                            initial={{ opacity: 0, y: 30 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.6 }}
-                        >
+    {relatedProducts.length > 0 && (
+        <motion.div 
+            className="mt-20"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}       
+            transition={{ duration: 0.6, delay: 0.5 }}
+        >
                             <div className="flex items-center justify-between mb-10">
                                 <div>
                                     <h2 className="text-3xl font-bold text-[#880E4F] flex items-center gap-2">
@@ -740,13 +737,12 @@ const ProductDetailPage = () => {
                                     </Link>
                                 </motion.div>
                             </div>
-                            <motion.div 
-                                className="grid grid-cols-2 md:grid-cols-4 gap-6"
-                                variants={containerVariants}
-                                initial="hidden"
-                                whileInView="visible"
-                                viewport={{ once: true }}
-                            >
+                           <motion.div 
+    className="grid grid-cols-2 md:grid-cols-4 gap-6"
+    variants={containerVariants}
+    initial="hidden"
+    animate="visible"              // ← animate
+>
                                 {relatedProducts.map((p, idx) => (
                                     <motion.div key={p._id} variants={itemVariants}>
                                         <ProductCard product={p} />

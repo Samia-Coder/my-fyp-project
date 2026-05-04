@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { redis } from "../lib/redis.js";
 import User from "../models/user.model.js";
 import jwt from "jsonwebtoken";
@@ -32,26 +33,42 @@ const setCookies = (res, accessToken, refreshToken) => {
 };
 
 export const signup = async (req, res) => {
-	const { email, password, name } = req.body;
-	try {
-		const userExists = await User.findOne({ email });
-		if (userExists) {
-			return res.status(400).json({ message: "User already exists" });
-		}
-		const user = await User.create({ name, email, password });
-		const { accessToken, refreshToken } = generateTokens(user._id);
-		await storeRefreshToken(user._id, refreshToken);
-		setCookies(res, accessToken, refreshToken);
-		res.status(201).json({
-			_id: user._id,
-			name: user.name,
-			email: user.email,
-			role: user.role,
-		});
-	} catch (error) {
-		console.log("Error in signup controller", error.message);
-		res.status(500).json({ message: error.message });
-	}
+    const { email, password, name } = req.body;
+    try {
+        console.log("📥 Signup request:", { email, name });
+        
+        const userExists = await User.findOne({ email });
+        console.log("🔍 User exists:", userExists ? "YES" : "NO");
+        
+        if (userExists) {
+            return res.status(400).json({ message: "User already exists" });
+        }
+        
+        console.log("💾 Creating user...");
+        const user = await User.create({ name, email, password });
+        console.log("✅ User created:", user);
+        
+        // ⬇️ VERIFY: Check if user actually saved in DB
+        const verifyUser = await User.findById(user._id);
+        console.log("🔍 Verified in DB:", verifyUser);
+        
+        // ⬇️ CHECK: Which database is being used
+        console.log("📊 Current DB:", mongoose.connection.db.databaseName);
+        
+        const { accessToken, refreshToken } = generateTokens(user._id);
+        await storeRefreshToken(user._id, refreshToken);
+        setCookies(res, accessToken, refreshToken);
+        
+        res.status(201).json({
+            _id: user._id,
+            name: user.name,
+            email: user.email,
+            role: user.role,
+        });
+    } catch (error) {
+        console.log("❌ Error:", error.message);
+        res.status(500).json({ message: error.message });
+    }
 };
 
 export const login = async (req, res) => {

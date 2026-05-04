@@ -7,12 +7,11 @@ export default defineConfig({
     server: {
         proxy: {
             "/api": {
-                target: "http://127.0.0.1:8000",
+                target: "http://127.0.0.1:8000", 
                 changeOrigin: true,
                 secure: false,
             },
         },
     },
-    // ⬇️ YE ADD KAREIN: Root .env se load karega
     envDir: path.resolve(__dirname, ".."),
-});
+}); 

@@ -69,14 +69,15 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 app.use("/api/orders", orderRoutes); // ⬅️ NEW ROUTE ADD KIA
-
+ 
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "/frontend/dist")));
     app.get("*", (req, res) => {
         res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
     });
-}
+}  
 
+ 
 app.listen(PORT, () => {
     console.log(`✅ Server running on http://localhost:${PORT}`);
     connectDB(); 

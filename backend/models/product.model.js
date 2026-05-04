@@ -25,12 +25,14 @@ const productSchema = new mongoose.Schema(
         category: {
             main: {
                 type: String,
-                required: true,
+                required: false, 
+        default: "",    
                 index: true,
             },
             sub: {
                 type: String,
-                required: true,
+                required: false, 
+        default: "",
                 index: true,
             },
             type: {
