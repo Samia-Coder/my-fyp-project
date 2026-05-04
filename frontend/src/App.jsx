@@ -1,28 +1,30 @@
 import { Navigate, Route, Routes } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, Suspense, lazy } from "react";
 import { Toaster } from "react-hot-toast";
 
-import HomePage from "./pages/HomePage";
-import SignUpPage from "./pages/SignUpPage";
-import LoginPage from "./pages/LoginPage";
-import AdminPage from "./pages/AdminPage";
-import CategoryPage from "./pages/CategoryPage";
 import Navbar from "./components/Navbar";
 import MegaMenu from "./components/MegaMenu";
 import Footer from "./components/Footer";
 import LoadingSpinner from "./components/LoadingSpinner";
-import CartPage from "./pages/CartPage";
-import PurchaseSuccessPage from "./pages/PurchaseSuccessPage";
-import PurchaseCancelPage from "./pages/PurchaseCancelPage";
-import AIChatbot from "./components/AIChatbot";
-import ProfilePage from "./pages/ProfilePage";
-import OrdersPage from "./pages/OrdersPage";
-import WishlistPage from "./pages/WishlistPage";
+import AIChatbot from "./components/AIChatbot"; 
 
 import { useUserStore } from "./stores/useUserStore";
 import { useCartStore } from "./stores/useCartStore";
-import ProductDetailPage from "./pages/ProductDetailPage";
-import SearchPage from "./pages/SearchPage";
+
+// Lazy load pages for better performance (code splitting)
+const HomePage = lazy(() => import("./pages/HomePage"));
+const SignUpPage = lazy(() => import("./pages/SignUpPage"));
+const LoginPage = lazy(() => import("./pages/LoginPage"));
+const AdminPage = lazy(() => import("./pages/AdminPage"));
+const CategoryPage = lazy(() => import("./pages/CategoryPage"));
+const CartPage = lazy(() => import("./pages/CartPage"));
+const PurchaseSuccessPage = lazy(() => import("./pages/PurchaseSuccessPage"));
+const PurchaseCancelPage = lazy(() => import("./pages/PurchaseCancelPage"));
+const ProfilePage = lazy(() => import("./pages/ProfilePage"));
+const OrdersPage = lazy(() => import("./pages/OrdersPage"));
+const WishlistPage = lazy(() => import("./pages/WishlistPage"));
+const ProductDetailPage = lazy(() => import("./pages/ProductDetailPage"));
+const SearchPage = lazy(() => import("./pages/SearchPage"));
 
 function App() {
     const { user, checkAuth, checkingAuth } = useUserStore();
@@ -40,7 +42,7 @@ function App() {
     if (checkingAuth) return <LoadingSpinner />;
 
     return (
-        <div className='min-h-screen bg-[#FFF5F7] text-[#2D2D2D] relative overflow-hidden'>
+        <div className='min-h-screen bg-brand-bg text-text-primary relative overflow-hidden'>
             {/* Background Decorations */}
             <div className='fixed inset-0 pointer-events-none'>
                 <div className='absolute top-0 left-0 w-full h-full bg-[radial-gradient(ellipse_at_top_right,rgba(194,24,91,0.08)_0%,transparent_50%)]' />
@@ -55,25 +57,27 @@ function App() {
                 <Navbar />
                 <MegaMenu />
                 <main className="pt-4 min-h-[calc(100vh-300px)]">
-                    <Routes>
-                        <Route path='/' element={<HomePage />} />
-                        <Route path='/signup' element={!user ? <SignUpPage /> : <Navigate to='/' />} />
-                        <Route path='/login' element={!user ? <LoginPage /> : <Navigate to='/' />} />
-                        <Route path='/profile' element={user ? <ProfilePage /> : <Navigate to='/login' />} />
-                        <Route path='/orders' element={user ? <OrdersPage /> : <Navigate to='/login' />} />
-                        <Route path='/wishlist' element={user ? <WishlistPage /> : <Navigate to='/login' />} />
-                        <Route path='/secret-dashboard' element={user?.role === "admin" ? <AdminPage /> : <Navigate to='/login' />} />
-                        
-                        {/* Category Routes */}
-                        <Route path='/category/:category' element={<CategoryPage />} />
-                        <Route path='/category/:category/:subcategory' element={<CategoryPage />} />
-                        
-                        <Route path='/cart' element={user ? <CartPage /> : <Navigate to='/login' />} />
-                        <Route path='/purchase-success' element={user ? <PurchaseSuccessPage /> : <Navigate to='/login' />} />
-                        <Route path='/purchase-cancel' element={user ? <PurchaseCancelPage /> : <Navigate to='/login' />} />
-                        <Route path='/product/:id' element={<ProductDetailPage />} />
-                        <Route path='/search' element={<SearchPage />} />
-                    </Routes>
+                    <Suspense fallback={<LoadingSpinner />}>
+                        <Routes>
+                            <Route path='/' element={<HomePage />} />
+                            <Route path='/signup' element={!user ? <SignUpPage /> : <Navigate to='/' />} />
+                            <Route path='/login' element={!user ? <LoginPage /> : <Navigate to='/' />} />
+                            <Route path='/profile' element={user ? <ProfilePage /> : <Navigate to='/login' />} />
+                            <Route path='/orders' element={user ? <OrdersPage /> : <Navigate to='/login' />} />
+                            <Route path='/wishlist' element={user ? <WishlistPage /> : <Navigate to='/login' />} />
+                            <Route path='/secret-dashboard' element={user?.role === "admin" ? <AdminPage /> : <Navigate to='/login' />} />
+                            
+                            {/* Category Routes */}
+                            <Route path='/category/:category' element={<CategoryPage />} />
+                            <Route path='/category/:category/:subcategory' element={<CategoryPage />} />
+                            
+                            <Route path='/cart' element={user ? <CartPage /> : <Navigate to='/login' />} />
+                            <Route path='/purchase-success' element={user ? <PurchaseSuccessPage /> : <Navigate to='/login' />} />
+                            <Route path='/purchase-cancel' element={user ? <PurchaseCancelPage /> : <Navigate to='/login' />} />
+                            <Route path='/product/:id' element={<ProductDetailPage />} />
+                            <Route path='/search' element={<SearchPage />} />
+                        </Routes>
+                    </Suspense>
                 </main>
                 <Footer />
             </div>
@@ -89,7 +93,7 @@ function App() {
                 }}
             />
             
-            <AIChatbot />
+            <AIChatbot /> 
         </div>
     );
 }
