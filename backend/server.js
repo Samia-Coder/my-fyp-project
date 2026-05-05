@@ -49,9 +49,8 @@ const __dirname = path.resolve();
 // ✅ COMPRESSION - Faster responses
 app.use(compression());
 
-// ✅ CACHE HEADERS for images and static files (YAHAN LAGAO)
+// ✅ CACHE HEADERS for images and static files
 app.use((req, res, next) => {
-    // Cache images for 1 day
     if (req.url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) {
         res.set('Cache-Control', 'public, max-age=86400');
     }
@@ -106,14 +105,25 @@ app.use((err, req, res, next) => {
     });
 });
 
-if (process.env.NODE_ENV === "production") {
-    app.use(express.static(path.join(__dirname, "/frontend/dist")));
-    app.get("*", (req, res) => {
-        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-    }); 
+// ============================================
+//  VERCEL DEPLOYMENT FIX
+// ============================================
+
+
+// ============================================
+// LOCAL DEVELOPMENT KE LIYE
+// ============================================
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`✅ Server running on http://localhost:${PORT}`);
+        connectDB();
+    });
+} else {
+    // Production mein bhi DB connect karo
+    connectDB();
 }
 
-app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
-    connectDB();
-});
+// ============================================
+// ⭐ VERCEL KE LIYE EXPORT - YEH MUST HAI!
+// ============================================
+export default app;
