@@ -120,4 +120,16 @@ if (process.env.NODE_ENV !== 'production') {
 // ============================================
 // ⭐ VERCEL EXPORT
 // ============================================
+// ============================================
+// ⭐ SERVE FRONTEND (Production only)
+// ============================================
+if (process.env.NODE_ENV === 'production') {
+    app.use(express.static(path.join(__dirname, '../frontend/dist')));
+    
+    app.get('*', (req, res) => {
+        if (!req.url.startsWith('/api')) {
+            res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
+        }
+    });
+}
 export default app;
