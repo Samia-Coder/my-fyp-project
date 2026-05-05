@@ -7,7 +7,7 @@
     "dev": "nodemon backend/server.js",
     "start": "node backend/server.js",
     "build": "cd frontend && npm install && npm run build"
-}
+},
     "keywords": [
         "e-commerce",
         "mern",
