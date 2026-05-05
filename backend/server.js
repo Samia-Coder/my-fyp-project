@@ -22,12 +22,13 @@ import { connectDB } from "./lib/db.js";
 
 const app = express();
 
-// ✅ CORS FIX - Production URL support added
+// ✅ CORS FIX - Space removed!
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:3000",
     process.env.CLIENT_URL,
+    "https://my-fyp-project-black.vercel.app",  // ✅ Space removed
 ].filter(Boolean);
 
 app.use(cors({
@@ -36,6 +37,7 @@ app.use(cors({
         if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
+            console.log('Blocked by CORS:', origin);
             callback(new Error('Not allowed by CORS'));
         }
     },
@@ -46,10 +48,8 @@ app.use(cors({
 const PORT = process.env.PORT || 8000;
 const __dirname = path.resolve();
 
-// ✅ COMPRESSION - Faster responses
 app.use(compression());
 
-// ✅ CACHE HEADERS for images and static files
 app.use((req, res, next) => {
     if (req.url.match(/\.(jpg|jpeg|png|gif|webp|svg)$/)) {
         res.set('Cache-Control', 'public, max-age=86400');
@@ -60,7 +60,6 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: "10mb" }));
 app.use(cookieParser());
 
-// 🔒 SECURITY MIDDLEWARE
 const limiter = rateLimit({
     windowMs: 15 * 60 * 1000,
     max: 100,
@@ -72,26 +71,29 @@ app.use('/api/', limiter);
 
 app.use(mongoSanitize());
 
-// ✅ CACHING HEADERS for API
-app.use('/api/products', (req, res, next) => {
-    res.set('Cache-Control', 'public, max-age=300');
-    next();
-});
+// ✅ DB Connection - Vercel ke liye
+let dbConnected = false;
+const ensureDB = async () => {
+    if (!dbConnected) {
+        await connectDB();
+        dbConnected = true;
+    }
+};
 
-// API Routes
-app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes);
-app.use("/api/cart", cartRoutes);
-app.use("/api/coupons", couponRoutes);
-app.use("/api/payments", paymentRoutes);
-app.use("/api/analytics", analyticsRoutes);
-app.use("/api/categories", categoryRoutes);
-app.use("/api/chatbot", chatbotRoutes);
-app.use("/api/orders", orderRoutes);
+// API Routes with DB connection
+app.use("/api/auth", async (req, res, next) => { await ensureDB(); next(); }, authRoutes);
+app.use("/api/products", async (req, res, next) => { await ensureDB(); next(); }, productRoutes);
+app.use("/api/cart", async (req, res, next) => { await ensureDB(); next(); }, cartRoutes);
+app.use("/api/coupons", async (req, res, next) => { await ensureDB(); next(); }, couponRoutes);
+app.use("/api/payments", async (req, res, next) => { await ensureDB(); next(); }, paymentRoutes);
+app.use("/api/analytics", async (req, res, next) => { await ensureDB(); next(); }, analyticsRoutes);
+app.use("/api/categories", async (req, res, next) => { await ensureDB(); next(); }, categoryRoutes);
+app.use("/api/chatbot", async (req, res, next) => { await ensureDB(); next(); }, chatbotRoutes);
+app.use("/api/orders", async (req, res, next) => { await ensureDB(); next(); }, orderRoutes);
 
-// ✅ 404 HANDLER
-app.use((req, res) => {
-    res.status(404).json({ success: false, message: 'Route not found' });
+// ✅ Health Check
+app.get('/api/health', (req, res) => {
+    res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
 // ✅ GLOBAL ERROR HANDLER
@@ -106,24 +108,16 @@ app.use((err, req, res, next) => {
 });
 
 // ============================================
-//  VERCEL DEPLOYMENT FIX
-// ============================================
-
-
-// ============================================
-// LOCAL DEVELOPMENT KE LIYE
+// LOCAL DEVELOPMENT
 // ============================================
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`✅ Server running on http://localhost:${PORT}`);
-        connectDB();
+        ensureDB();
     });
-} else {
-    // Production mein bhi DB connect karo
-    connectDB();
 }
 
 // ============================================
-// ⭐ VERCEL KE LIYE EXPORT - YEH MUST HAI!
+// ⭐ VERCEL EXPORT
 // ============================================
 export default app;
