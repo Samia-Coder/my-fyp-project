@@ -22,13 +22,13 @@ import { connectDB } from "./lib/db.js";
 
 const app = express();
 
-// ✅ CORS FIX - Space removed!
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:3000",
     process.env.CLIENT_URL,
-    "https://my-fyp-project-black.vercel.app",  // ✅ Space removed
+    "https://my-fyp-project-black.vercel.app",
+    "https://my-fyp-frontend-pink.vercel.app",  // ✅ Aapka new frontend URL add karo
 ].filter(Boolean);
 
 app.use(cors({
@@ -46,7 +46,6 @@ app.use(cors({
 }));
 
 const PORT = process.env.PORT || 8000;
-const __dirname = path.resolve();
 
 app.use(compression());
 
@@ -71,7 +70,6 @@ app.use('/api/', limiter);
 
 app.use(mongoSanitize());
 
-// ✅ DB Connection - Vercel ke liye
 let dbConnected = false;
 const ensureDB = async () => {
     if (!dbConnected) {
@@ -80,7 +78,6 @@ const ensureDB = async () => {
     }
 };
 
-// API Routes with DB connection
 app.use("/api/auth", async (req, res, next) => { await ensureDB(); next(); }, authRoutes);
 app.use("/api/products", async (req, res, next) => { await ensureDB(); next(); }, productRoutes);
 app.use("/api/cart", async (req, res, next) => { await ensureDB(); next(); }, cartRoutes);
@@ -91,12 +88,10 @@ app.use("/api/categories", async (req, res, next) => { await ensureDB(); next();
 app.use("/api/chatbot", async (req, res, next) => { await ensureDB(); next(); }, chatbotRoutes);
 app.use("/api/orders", async (req, res, next) => { await ensureDB(); next(); }, orderRoutes);
 
-// ✅ Health Check
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
 });
 
-// ✅ GLOBAL ERROR HANDLER
 app.use((err, req, res, next) => {
     console.error('❌ Error:', err.stack);
     res.status(err.status || 500).json({ 
@@ -107,9 +102,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-// ============================================
-// LOCAL DEVELOPMENT
-// ============================================
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`✅ Server running on http://localhost:${PORT}`);
@@ -117,19 +109,5 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
-// ============================================
-// ⭐ VERCEL EXPORT
-// ============================================
-// ============================================
-// ⭐ SERVE FRONTEND (Production only)
-// ============================================
-if (process.env.NODE_ENV === 'production') {
-    app.use(express.static(path.join(__dirname, '../frontend/dist')));
-    
-    app.get('*', (req, res) => {
-        if (!req.url.startsWith('/api')) {
-            res.sendFile(path.resolve(__dirname, '../frontend/dist', 'index.html'));
-        }
-    });
-}
+// ✅ BAS YE RAKHO — Vercel ke liye
 export default app;
