@@ -22,7 +22,7 @@ const HomePage = () => {
 
     const heroSlides = [
         {
-            image: "/public/image/hero-banner1.jpg",
+            image: "/image/hero-banner1.jpg",
             title: "Shop the Best Deals",
             subtitle: "Discover amazing products at unbeatable prices",
             cta: "Shop Now",
@@ -30,7 +30,7 @@ const HomePage = () => {
             badge: "New Collection"
         },
         {
-            image: "/public/image/hero-banner2.jpg",
+            image: "/image/hero-banner2.jpg",
             title: "Summer Sale 2026",
             subtitle: "Up to 50% off on selected items",
             cta: "View Deals",
@@ -38,7 +38,7 @@ const HomePage = () => {
             badge: "Hot Sale"
         },
         {
-            image: "/public/image/hero-banner3.jpg",
+            image: "/image/hero-banner3.jpg",
             title: "Premium Fashion",
             subtitle: "Elevate your style with our exclusive collection",
             cta: "Explore",
@@ -413,9 +413,9 @@ const HomePage = () => {
                 imageUrl = categoryImageMap[slug] || categoryImageMap[name] || '/image/electronics.jpg';
             }
             
-            if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/image/') && !imageUrl.startsWith('/public/')) {
-                imageUrl = `/image/${imageUrl}`;
-            }
+            if (imageUrl && !imageUrl.startsWith('http') && !imageUrl.startsWith('/image/')) {
+    imageUrl = `/image/${imageUrl}`;
+}
 
             const itemCount = category.subcategories?.length || 0;
 
