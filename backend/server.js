@@ -50,8 +50,6 @@ app.use(cors({
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
 
-const PORT = process.env.PORT || 8000;
-
 app.use(compression());
 
 app.use((req, res, next) => {
@@ -86,9 +84,9 @@ const ensureDB = async (req, res, next) => {
         next();
     } catch (error) {
         console.error("❌ DB Connection Failed:", error.message);
-        return res.status(500).json({ 
-            success: false, 
-            message: "Database connection failed. Please try again later." 
+        return res.status(500).json({
+            success: false,
+            message: "Database connection failed. Please try again later."
         });
     }
 };
@@ -109,18 +107,20 @@ app.get('/api/health', (req, res) => {
 
 app.use((err, req, res, next) => {
     console.error('❌ Error:', err.stack);
-    res.status(err.status || 500).json({ 
-        success: false, 
-        message: process.env.NODE_ENV === 'production' 
-            ? 'Something went wrong!' 
-            : err.message 
+    res.status(err.status || 500).json({
+        success: false,
+        message: process.env.NODE_ENV === 'production'
+            ? 'Something went wrong!'
+            : err.message
     });
 });
 
+// Only listen locally, not on Vercel
 if (process.env.NODE_ENV !== 'production') {
+    const PORT = process.env.PORT || 8000;
     app.listen(PORT, () => {
         console.log(`✅ Server running on http://localhost:${PORT}`);
     });
 }
 
-module.exports = app;
+export default app;
