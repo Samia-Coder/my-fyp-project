@@ -1,11 +1,16 @@
 import dotenv from "dotenv";
-dotenv.config();
+import { fileURLToPath } from "url";
+import path from "path";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+dotenv.config({ path: path.join(__dirname, ".env") });
 
 import express from "express";
 import rateLimit from 'express-rate-limit';
 import mongoSanitize from 'express-mongo-sanitize';
 import cookieParser from "cookie-parser";
-import path from "path";
 import cors from "cors";
 import compression from 'compression';
 
@@ -28,7 +33,7 @@ const allowedOrigins = [
     "http://localhost:3000",
     process.env.CLIENT_URL,
     "https://my-fyp-project-black.vercel.app",
-    "https://my-fyp-frontend-pink.vercel.app",  // ✅ Aapka new frontend URL add karo
+    "https://my-fyp-frontend-pink.vercel.app",
 ].filter(Boolean);
 
 app.use(cors({
@@ -71,22 +76,32 @@ app.use('/api/', limiter);
 app.use(mongoSanitize());
 
 let dbConnected = false;
-const ensureDB = async () => {
-    if (!dbConnected) {
-        await connectDB();
-        dbConnected = true;
+
+const ensureDB = async (req, res, next) => {
+    try {
+        if (!dbConnected) {
+            await connectDB();
+            dbConnected = true;
+        }
+        next();
+    } catch (error) {
+        console.error("❌ DB Connection Failed:", error.message);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Database connection failed. Please try again later." 
+        });
     }
 };
 
-app.use("/api/auth", async (req, res, next) => { await ensureDB(); next(); }, authRoutes);
-app.use("/api/products", async (req, res, next) => { await ensureDB(); next(); }, productRoutes);
-app.use("/api/cart", async (req, res, next) => { await ensureDB(); next(); }, cartRoutes);
-app.use("/api/coupons", async (req, res, next) => { await ensureDB(); next(); }, couponRoutes);
-app.use("/api/payments", async (req, res, next) => { await ensureDB(); next(); }, paymentRoutes);
-app.use("/api/analytics", async (req, res, next) => { await ensureDB(); next(); }, analyticsRoutes);
-app.use("/api/categories", async (req, res, next) => { await ensureDB(); next(); }, categoryRoutes);
-app.use("/api/chatbot", async (req, res, next) => { await ensureDB(); next(); }, chatbotRoutes);
-app.use("/api/orders", async (req, res, next) => { await ensureDB(); next(); }, orderRoutes);
+app.use("/api/auth", ensureDB, authRoutes);
+app.use("/api/products", ensureDB, productRoutes);
+app.use("/api/cart", ensureDB, cartRoutes);
+app.use("/api/coupons", ensureDB, couponRoutes);
+app.use("/api/payments", ensureDB, paymentRoutes);
+app.use("/api/analytics", ensureDB, analyticsRoutes);
+app.use("/api/categories", ensureDB, categoryRoutes);
+app.use("/api/chatbot", ensureDB, chatbotRoutes);
+app.use("/api/orders", ensureDB, orderRoutes);
 
 app.get('/api/health', (req, res) => {
     res.json({ status: 'OK', timestamp: new Date().toISOString() });
@@ -105,9 +120,7 @@ app.use((err, req, res, next) => {
 if (process.env.NODE_ENV !== 'production') {
     app.listen(PORT, () => {
         console.log(`✅ Server running on http://localhost:${PORT}`);
-        ensureDB();
     });
 }
 
-// ✅ BAS YE RAKHO — Vercel ke liye
 export default app;
