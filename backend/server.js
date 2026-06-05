@@ -1,39 +1,69 @@
-import mongoose from "mongoose";
+import dotenv from "dotenv";
+dotenv.config();
 
-export const connectDB = async () => {
-    try {
-        const mongoURI = process.env.MONGO_URI;
+import express from "express";
+import cookieParser from "cookie-parser";
+import path from "path";
+import cors from "cors";
+
+import authRoutes from "./routes/auth.route.js";
+import productRoutes from "./routes/product.route.js";
+import cartRoutes from "./routes/cart.route.js";
+import couponRoutes from "./routes/coupon.route.js";
+import paymentRoutes from "./routes/payment.route.js";
+import analyticsRoutes from "./routes/analytics.route.js";
+import categoryRoutes from "./routes/category.route.js";
+import chatbotRoutes from "./routes/chatbot.route.js";
+import { connectDB } from "./lib/db.js";
+
+const app = express();
+
+//CORS FIX - Multiple origins allow kia
+const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:5174",  
+    "http://localhost:3000",
+];  
+
+app.use(cors({
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
         
-        if (!mongoURI) {
-            console.log("❌ MONGO_URI missing in environment variables!");
-            return;
+        if (allowedOrigins.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
         }
-        
-        console.log("🔗 Connecting to:", mongoURI.includes('atlas') ? 'MongoDB Atlas ☁️' : 'Local MongoDB 💻');
-        
-        const conn = await mongoose.connect(mongoURI);
-        console.log(`✅ MongoDB connected: ${conn.connection.host}`);
-        
-        await createIndexes();
-    } catch (error) {
-        console.log("❌ MongoDB Error:", error.message);
-    }
-};
+    },
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
-const createIndexes = async () => {
-    try {
-        const db = mongoose.connection.db;
-        
-        await db.collection('products').createIndex({ name: 'text', description: 'text' });
-        await db.collection('products').createIndex({ category: 1, price: 1 });
-        await db.collection('products').createIndex({ createdAt: -1 });
-        await db.collection('products').createIndex({ isFeatured: 1 });
-        
-        await db.collection('users').createIndex({ email: 1 }, { unique: true });
-        await db.collection('orders').createIndex({ user: 1, createdAt: -1 });
-        
-        console.log('✅ Database indexes created successfully');
-    } catch (error) {
-        console.log('⚠️ Index creation warning:', error.message);
-    }
-};
+const PORT = process.env.PORT || 8000;
+const __dirname = path.resolve();
+
+app.use(express.json({ limit: "10mb" }));
+app.use(cookieParser());
+
+// API Routes
+app.use("/api/auth", authRoutes);
+app.use("/api/products", productRoutes);
+app.use("/api/cart", cartRoutes);
+app.use("/api/coupons", couponRoutes);
+app.use("/api/payments", paymentRoutes);
+app.use("/api/analytics", analyticsRoutes);
+app.use("/api/categories", categoryRoutes);
+app.use("/api/chatbot", chatbotRoutes);
+
+if (process.env.NODE_ENV === "production") {
+    app.use(express.static(path.join(__dirname, "/frontend/dist")));
+    app.get("*", (req, res) => {
+        res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+    });
+}
+
+app.listen(PORT, () => {
+    console.log(`✅ Server running on http://localhost:${PORT}`);
+    connectDB();
+});
