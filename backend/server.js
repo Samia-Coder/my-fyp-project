@@ -18,27 +18,30 @@ import { connectDB } from "./lib/db.js";
 
 const app = express();
 
-//CORS FIX - Multiple origins allow kia
+// ✅ CORS FIX - Allow ALL origins with credentials
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://localhost:3000",
-    "https://my-fyp-project-production.up.railway.app",  // ← YEH ADD KARO
+    "https://my-fyp-project-production.up.railway.app",
     process.env.CLIENT_URL,
 ].filter(Boolean);
 
 app.use(cors({
     origin: function (origin, callback) {
+        // Allow requests with no origin (like same-origin or mobile apps)
         if (!origin) return callback(null, true);
+        
         if (allowedOrigins.indexOf(origin) !== -1) {
             callback(null, true);
         } else {
+            console.log("CORS blocked origin:", origin); // Debug log
             callback(new Error('Not allowed by CORS'));
         }
     },
     credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],  // ← yeh add karo
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 }));
 
 const PORT = process.env.PORT || 8000;
@@ -57,6 +60,7 @@ app.use("/api/analytics", analyticsRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/chatbot", chatbotRoutes);
 
+// SERVE FRONTEND IN PRODUCTION
 if (process.env.NODE_ENV === "production") {
     app.use(express.static(path.join(__dirname, "/frontend/dist")));
     app.get("*", (req, res) => {
@@ -65,6 +69,6 @@ if (process.env.NODE_ENV === "production") {
 }
 
 app.listen(PORT, () => {
-    console.log(`✅ Server running on http://localhost:${PORT}`);
+    console.log(`Server running on port ${PORT}`);
     connectDB();
 });
