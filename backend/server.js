@@ -21,11 +21,11 @@ const app = express();
 //CORS FIX - Multiple origins allow kia
 const allowedOrigins = [
     "http://localhost:5173",
-    "http://localhost:5174",
+    "http://localhost:5174",  
     "http://localhost:3000",
     "https://my-fyp-frontend-pink.vercel.app",
-    "https://my-fyp-frontend-pink.vercel.app/"
-]; 
+    process.env.CLIENT_URL,
+].filter(Boolean);
 
 app.use(cors({
     origin: function (origin, callback) {

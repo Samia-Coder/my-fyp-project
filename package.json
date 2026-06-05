@@ -3,11 +3,11 @@
     "version": "1.0.0",
     "description": "A modern full-stack e-commerce platform built with MERN stack",
     "main": "backend/server.js",
-   "scripts": {
-    "dev": "nodemon backend/server.js",
-    "start": "node backend/server.js",
-    "build": "cd frontend && npm install && npm run build"
-},
+    "scripts": {
+        "dev": "nodemon backend/server.js",
+        "start": "node backend/server.js",
+        "build": "cd frontend && npm install && npm run build"
+    },
     "keywords": [
         "e-commerce",
         "mern",
@@ -31,7 +31,7 @@
         "express": "^4.19.2",
         "express-mongo-sanitize": "^2.2.0",
         "express-rate-limit": "^8.4.1",
-        "ioredis": "^5.4.1",
+        "ioredis": "^5.11.1",
         "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.5.3",
         "stripe": "^16.8.0"
