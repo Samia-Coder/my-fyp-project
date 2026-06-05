@@ -23,7 +23,8 @@ const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",  
     "http://localhost:3000",
-    "https://my-fyp-frontend-pink.vercel.app",
+    "https://my-fyp-frontend-71suihhsr-samia-coders-projects.vercel.app",
+"https://my-fyp-frontend-pink.vercel.app",
     process.env.CLIENT_URL,
 ].filter(Boolean);
 
