@@ -47,6 +47,9 @@
 //     }
 // };
 
+
+
+
 import mongoose from "mongoose";
 import dotenv from "dotenv";
 import { fileURLToPath } from "url";
@@ -59,22 +62,21 @@ dotenv.config({ path: path.resolve(__dirname, "..", "..", ".env") });
 
 export const connectDB = async () => {
     try {
-        console.log("📁 __dirname:", __dirname);
-        console.log("📁 Looking for .env at:", path.resolve(__dirname, "..", "..", ".env"));
-        console.log("🔍 MONGO_URI value:", process.env.MONGO_URI ? "EXISTS ✅" : "UNDEFINED ❌");
-        
         const mongoURI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/safira_mart";
         
-        console.log("🔗 Connecting to:", mongoURI.includes('atlas') ? 'MongoDB Atlas ☁️' : 'Local MongoDB 💻');
-        
-        // ✅ FIX: Explicitly set options to override defaults
         const conn = await mongoose.connect(mongoURI, {
-            useNewUrlParser: true,
-            useUnifiedTopology: true
-            // keepAlive options removed - not supported in mongoose v6+
+            // ✅ FIX: Connection pool settings
+            maxPoolSize: 15,           // Default 5 se badhao
+            minPoolSize: 3,            // Minimum connections hamesha ready
+            serverSelectionTimeoutMS: 10000,  // 10 sec timeout
+            socketTimeoutMS: 45000,     // 45 sec socket timeout
+            connectTimeoutMS: 10000,    // 10 sec connection timeout
+            retryWrites: true,
+            w: 'majority'
         });
         
         console.log(`✅ MongoDB connected: ${conn.connection.host}`);
+        console.log(`📊 Pool size: ${mongoose.connection.getClient().options.maxPoolSize || 'default'}`);
         
         await createIndexes();
     } catch (error) {
