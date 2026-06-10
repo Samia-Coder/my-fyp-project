@@ -4,9 +4,8 @@ import { fileURLToPath } from "url";
 import path from "path";
 
 const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);  // ✅ __filename se banao, __dirname se nahi!
+const __dirname = path.dirname(__filename);
 
-// ✅ ROOT folder se .env load karo (2 levels up: lib → backend → root)
 dotenv.config({ path: path.resolve(__dirname, "..", "..", ".env") });
 
 export const connectDB = async () => {
@@ -19,8 +18,25 @@ export const connectDB = async () => {
         
         console.log("🔗 Connecting to:", mongoURI.includes('atlas') ? 'MongoDB Atlas ☁️' : 'Local MongoDB 💻');
         
-        const conn = await mongoose.connect(mongoURI);
+        // ✅ ADD THESE OPTIONS TO mongoose.connect
+        const conn = await mongoose.connect(mongoURI, {
+            maxPoolSize: 10,
+            serverSelectionTimeoutMS: 5000,
+            socketTimeoutMS: 45000,
+            keepAlive: true,
+            keepAliveInitialDelay: 300000,
+        });
+        
         console.log(`✅ MongoDB connected: ${conn.connection.host}`);
+        
+        // ✅ ADD CONNECTION EVENT HANDLERS
+        mongoose.connection.on('error', (err) => {
+            console.error('❌ MongoDB connection error:', err);
+        });
+        
+        mongoose.connection.on('disconnected', () => {
+            console.log('⚠️ MongoDB disconnected, attempting reconnect...');
+        });
         
         await createIndexes();
     } catch (error) {
